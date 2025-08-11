@@ -1,0 +1,82 @@
+html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Casa de Apostas</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="auth">
+    <h2>Login</h2>
+    <input type="text" id="loginUser" placeholder="Usuário" />
+    <input type="password" id="loginPass" placeholder="Senha" />
+    <button onclick="login()">Entrar</button>
+    <p>ou</p>
+    <h2>Cadastro</h2>
+    <input type="text" id="registerUser" placeholder="Usuário" />
+    <input type="password" id="registerPass" placeholder="Senha" />
+    <button onclick="register()">Cadastrar</button>
+  </div>
+
+  <div id="main" style="display:none;">
+    <header>
+      <h1>Casa de Apostas</h1>
+      <p id="userInfo"></p>
+      <p id="saldo">Saldo: 100 MZN</p>
+      <button onclick="logout()">Sair</button>
+    </header>
+
+    <nav>
+      <button onclick="showSection('aviator')">Aviator</button>
+      <button onclick="showSection('minas')">Minas</button>
+      <button onclick="showSection('plinko')">Plinko</button>
+      <button onclick="showSection('finance')">Depósito/Levantamento</button>
+    </nav>
+
+    <section id="aviator" class="game-section">
+  <h2>Aviator</h2>
+  <input type="number" id="aviatorBet" placeholder="Valor da aposta" />
+  <button onclick="startAviator()">Iniciar</button>
+  <button id="aviatorCashout" onclick="cashoutAviator()" style="display:none;">Sacar</button>
+  <p id="aviatorStatus"></p>
+</section>
+
+    <section id="minas" class="game-section" style="display:none;">
+      <h2>Minas</h2>
+      <input type="number" id="minasBet" placeholder="Valor da aposta" />
+      <button onclick="startMinas()">Iniciar</button>
+      <div id="minasBoard"></div>
+      <p id="minasStatus"></p>
+    </section>
+
+    <section id="plinko" class="game-section" style="display:none;">
+      <h2>Plinko</h2>
+      <input type="number" id="plinkoBet" placeholder="Valor da aposta" />
+      <button onclick="startPlinko()">Jogar</button>
+      <p id="plinkoStatus"></p>
+    </section>
+
+    <section id="finance" class="game-section" style="display:none;">
+      <h2>Depósito</h2>
+      <input type="number" id="depositAmount" placeholder="Valor" />
+      <select id="depositMethod">
+        <option value="e-mola">e-Mola</option>
+        <option value="m-pesa">M-Pesa</option>
+      </select>
+      <button onclick="deposit()">Depositar</button>
+
+      <h2>Levantamento</h2>
+      <input type="number" id="withdrawAmount" placeholder="Valor" />
+      <select id="withdrawMethod">
+        <option value="e-mola">e-Mola</option>
+        <option value="m-pesa">M-Pesa</option>
+      </select>
+      <button onclick="withdraw()">Levantar</button>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
