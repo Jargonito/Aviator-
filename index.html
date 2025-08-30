@@ -1,82 +1,243 @@
-html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Casa de Apostas</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Calculadora de Dose</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #f1f8e9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+}
+
+.container {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 350px;
+      text-align: center;
+}
+
+    h2 {
+      color: #FF1C15FF;
+      margin-bottom: 20px;
+}
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #30;
+}
+
+    select, input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+}
+
+    button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      background-color: #00796b;
+      color: black;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+}
+
+    button:hover {
+      background-color: #004d40;
+}
+
+    #resultado {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #388e3c;
+      font-weight: bold;
+}
+  </style>
 </head>
 <body>
-  <div id="auth">
-    <h2>Login</h2>
-    <input type="text" id="loginUser" placeholder="Usuário" />
-    <input type="password" id="loginPass" placeholder="Senha" />
-    <button onclick="login()">Entrar</button>
-    <p>ou</p>
-    <h2>Cadastro</h2>
-    <input type="text" id="registerUser" placeholder="Usuário" />
-    <input type="password" id="registerPass" placeholder="Senha" />
-    <button onclick="register()">Cadastrar</button>
-  </div>
+<div class="container">
+  <h2>Calculadora de Dose</h2>
 
-  <div id="main" style="display:none;">
-    <header>
-      <h1>Casa de Apostas</h1>
-      <p id="userInfo"></p>
-      <p id="saldo">Saldo: 100 MZN</p>
-      <button onclick="logout()">Sair</button>
-    </header>
+  <label for="medicamento">Medicamento:</label>
+  <select id="medicamento" onchange="atualizarSlider()">
+    <option value="paracetamol">Paracetamol</option>
+    <option value="ibuprofeno">Ibuprofeno</option>
+    <option value="amoxicilina">Amoxicilina</option>
+    <option value="gentamicina">gentamicina</option>
+      <option value="ceftriaxona">ceftriaxona</option>
+      <option value="metronidazol">metronidazol</option>
+      <option value="prednisolona">prednisolona</option>
+      <option value="ampicillina">ampicillina</option>
+      <option value="furosemida">furosemida</option>
+  </select>
 
-    <nav>
-      <button onclick="showSection('aviator')">Aviator</button>
-      <button onclick="showSection('minas')">Minas</button>
-      <button onclick="showSection('plinko')">Plinko</button>
-      <button onclick="showSection('finance')">Depósito/Levantamento</button>
-    </nav>
+  <label for="peso">Peso do paciente (kg):</label>
+  <input type="number" id="peso" min="1" placeholder="Digite o peso">
 
-    <section id="aviator" class="game-section">
-  <h2>Aviator</h2>
-  <input type="number" id="aviatorBet" placeholder="Valor da aposta" />
-  <button onclick="startAviator()">Iniciar</button>
-  <button id="aviatorCashout" onclick="cashoutAviator()" style="display:none;">Sacar</button>
-  <p id="aviatorStatus"></p>
-</section>
+  <label for="doseSlider">Dose por kg (mg/kg): <span id="doseValor">10</span></label>
+  <input type="range" id="doseSlider" min="10" max="15" value="10" step="0.5">
 
-    <section id="minas" class="game-section" style="display:none;">
-      <h2>Minas</h2>
-      <input type="number" id="minasBet" placeholder="Valor da aposta" />
-      <button onclick="startMinas()">Iniciar</button>
-      <div id="minasBoard"></div>
-      <p id="minasStatus"></p>
-    </section>
+  <button onclick="calcularDose()">Calcular Dose</button>
 
-    <section id="plinko" class="game-section" style="display:none;">
-      <h2>Plinko</h2>
-      <input type="number" id="plinkoBet" placeholder="Valor da aposta" />
-      <button onclick="startPlinko()">Jogar</button>
-      <p id="plinkoStatus"></p>
-    </section>
+  <div id="resultado"></div>
+</div>
 
-    <section id="finance" class="game-section" style="display:none;">
-      <h2>Depósito</h2>
-      <input type="number" id="depositAmount" placeholder="Valor" />
-      <select id="depositMethod">
-        <option value="e-mola">e-Mola</option>
-        <option value="m-pesa">M-Pesa</option>
-      </select>
-      <button onclick="deposit()">Depositar</button>
+<script>
+  const slider = document.getElementById("doseSlider");
+  const doseValor = document.getElementById("doseValor");
+  const medicamentoSelect = document.getElementById("medicamento");
 
-      <h2>Levantamento</h2>
-      <input type="number" id="withdrawAmount" placeholder="Valor" />
-      <select id="withdrawMethod">
-        <option value="e-mola">e-Mola</option>
-        <option value="m-pesa">M-Pesa</option>
-      </select>
-      <button onclick="withdraw()">Levantar</button>
-    </section>
-  </div>
+  // Dados dos medicamentos
+  const medicamentos = {
+  paracetamol: {
+    nome: "Paracetamol",
+    min: 10,
+    max: 15,
+    posologia: "de 6/6 h",
+    doseMaxima: 4000,
+    frequencia: "4 vezes ao dia",
+    interacoes: ["ibuprofeno"],
+    formula: (dose, peso) => dose * peso
+},
+  ibuprofeno: {
+    nome: "Ibuprofeno",
+    min: 15,
+    max: 20,
+    posologia: "de 8/8h",
+    doseMaxima: 2400,
+    frequencia: "3 vezes ao dia",
+    interacoes: ["paracetamol"],
+    formula: (dose, peso) => (dose * peso)/3
+},
+  amoxicilina: {
+    nome: "Amoxicilina",
+    min: 50,
+    max: 100,
+    posologia: "de 8/8h ",
+    doseMaxima: 3000,
+    frequencia: "3 vezes ao dia",
+    interacoes: [],
+    formula: (dose, peso) => (dose * peso) / 3
+},
+metronidazol: {
+    nome: "Metronidazol",
+    min: 40,
+    max: 50,
+    posologia: "de 8/8h ",
+    doseMaxima: 3000,
+    frequencia: "3 vezes ao dia",
+    interacoes: [],
+    formula: (dose, peso) => (dose * peso) / 3
+},
+ampicillina: {
+    nome: "ampicillina",
+    min: 100,
+    max: 200,
+    posologia: "de 6/6 h ",
+    doseMaxima: 3000,
+    frequencia: "4 vezes ao dia",
+    interacoes: [],
+    formula: (dose, peso) => (dose * peso) / 4
+},
+  gentamicina: {
+    nome: "Gentamicina",
+    min: 3,
+    max: 7,
+    posologia: "de 12/12 h",
+    doseMaxima: 4000,
+    frequencia: "3 a 4 vezes ao dia",
+    interacoes: ["ibuprofeno"],
+    formula: (dose, peso) => (dose * peso) / 2
+},
+prednisolona: {
+    nome: "prednisolona",
+    min: 1,
+    max: 2,
+    posologia: "de 12/12h ",
+    doseMaxima: 3000,
+    frequencia: "2 vezes ao dia",
+    interacoes: [],
+    formula: (dose, peso) => (dose * peso) 
+},
+furosemida: {
+    nome: "furosemida",
+    min: 2,
+    max: 4,
+    posologia: "24/24 ",
+    doseMaxima: 3000,
+    frequencia: "1 vezes ao dia",
+    interacoes: [],
+    formula: (dose, peso) => (dose * peso)
+},
+  ceftriaxona: {
+    nome: "Ceftriaxona",
+    min: 50,
+    max: 100,
+    posologia: "1x/dia",
+    doseMaxima: 2400,
+    frequencia: "1",
+    interacoes: ["paracetamol"],
+    formula: (dose, peso) => (dose * peso) 
+}
+};
+  function atualizarSlider() {
+    const medicamento = medicamentoSelect.value;
+    const dados = medicamentos[medicamento];
 
-  <script src="script.js"></script>
-</body>
-</html>
+    slider.min = dados.min;
+    slider.max = dados.max;
+    slider.value = dados.min;
+    doseValor.textContent = slider.value;
+}
+
+  slider.addEventListener("input", () => {
+    doseValor.textContent = slider.value;
+});
+
+  function calcularDose() {
+  const peso = parseFloat(document.getElementById("peso").value);
+  const dosePorKg = parseFloat(slider.value);
+  const medicamento = medicamentoSelect.value;
+  const dados = medicamentos[medicamento];
+
+  if (isNaN(peso) || peso <= 0) {
+    document.getElementById("resultado").innerText = "Insira um peso válido.";
+    return;
+}
+
+  const doseFinal = dados.formula(dosePorKg, peso);
+  const alerta = doseFinal> dados.doseMaxima
+? `<span style="color:red;">⚠️ Excede a dose máxima diária de ${dados.doseMaxima} mg!</span>`
+: `<span style="color:green;">Dentro do limite seguro.</span>`;
+
+  const interacoes = dados.interacoes.length> 0
+? `<br><strong>Interações:</strong> evitar uso concomitante com ${dados.interacoes.join(", ")}.`
+: "";
+
+  document.getElementById("resultado").innerHTML = `
+    <strong>${dados.nome}</strong><br>
+    Dose ajustada: <strong>${doseFinal.toFixed(2)} mg</strong><br>
+    Posologia: <em>${dados.posologia}</em><br>
+    Frequência: <strong>${dados.frequencia}</strong><br>
+    Dose máxima diária: <strong>${dados.doseMaxima} mg</strong><br>
+    ${alerta}
+    ${interacoes}
+  `;
+}
+
+  atualizarSlider();
+</script>
