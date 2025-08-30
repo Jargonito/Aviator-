@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de Dose</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #f1f8e9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+}
+
+.container {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 350px;
+      text-align: center;
+}
+
+    h2 {
+      color: #FF1C15FF;
+      margin-bottom: 20px;
+}
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #30;
+}
+
+    select, input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+}
+
+    button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      background-color: #00796b;
+      color: black;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+}
+
+    button:hover {
+      background-color: #004d40;
+}
+
+    #resultado {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #388e3c;
+      font-weight: bold;
+}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Calculadora de Dose</h2>
+
+  <label for="medicamento">Medicamento:</label>
+  <select id="medicamento" onchange="atualizarSlider()">
+    <option value="paracetamol">Paracetamol</option>
+    <option value="ibuprofeno">Ibuprofeno</option>
+    <option value="amoxicilina">Amoxicilina</option>
+    <option value="gentamicina">gentamicina</option>
+      <option value="ceftriaxona">ceftriaxona</option>
+      <option value="metronidazol">metronidazol</option>
+      <option value="prednisolona">prednisolona</option>
+      <option value="ampicillina">ampicillina</option>
+      <option value="furosemida">furosemida</option>
+  </select>
+
+  <label for="peso">Peso do paciente (kg):</label>
+  <input type="number" id="peso" min="1" placeholder="Digite o peso">
+
+  <label for="doseSlider">Dose por kg (mg/kg): <span id="doseValor">10</span></label>
+  <input type="range" id="doseSlider" min="10" max="15" value="10" step="0.5">
+
+  <button onclick="calcularDose()">Calcular Dose</button>
+
+  <div id="resultado"></div>
+</div>
+
+<script>
+  const slider = document.getElementById("doseSlider");
+  const doseValor = document.getElementById("doseValor");
+  const medicamentoSelect = document.getElementById("medicamento");
+
+  // Dados dos medicamentos
+  const medicamentos = {
+  paracetamol: {
+    nome: "Paracetamol",
+    min: 10,
+    max: 15,
+    posologia: "de 6/6 h",
+    doseMaxima: 4000,
+    frequencia: "4 vezes ao dia",
+    interacoes: ["ibuprofeno"],
+    formula: (dose, peso) => dose * peso
+},
+  ibuprofeno: {
+    nome: "Ibuprofeno",
+    min: 15,
+    max: 20,
+    posologia: "de 8/8h",
+    doseMaxima: 2400,
+    frequencia: "3 vezes ao dia",
+    interacoes: ["paracetamol"],
+    formula: (dose, peso) => (dose * peso)/3
+},
+  amoxicilina: {
+    nome: "Amoxicilina",
+    min: 50,
+    max: 100,
+    posologia: "de 8/8h ",
+    doseMaxima: 3000,
+    frequencia: "3 vezes ao dia",
+    interacoes: [],
+    formula: (dose, peso) => (dose * peso) / 3
+},
+metronidazol: {
+    nome: "Metronidazol",
+    min: 40,
+    max: 50,
+    posologia: "de 8/8h ",
+    doseMaxima: 3000,
+    frequencia: "3 vezes ao dia",
+    interacoes: [],
+    formula: (dose, peso) => (dose * peso) / 3
+},
+ampicillina: {
+    nome: "ampicillina",
+    min: 100,
+    max: 200,
+    posologia: "de 6/6 h ",
+    doseMaxima: 3000,
+    frequencia: "4 vezes ao dia",
+    interacoes: [],
+    formula: (dose, peso) => (dose * peso) / 4
+},
+  gentamicina: {
+    nome: "Gentamicina",
+    min: 3,
+    max: 7,
+    posologia: "de 12/12 h",
+    doseMaxima: 4000,
+    frequencia: "3 a 4 vezes ao dia",
+    interacoes: ["ibuprofeno"],
+    formula: (dose, peso) => (dose * peso) / 2
+},
+prednisolona: {
+    nome: "prednisolona",
+    min: 1,
+    max: 2,
+    posologia: "de 12/12h ",
+    doseMaxima: 3000,
+    frequencia: "2 vezes ao dia",
+    interacoes: [],
+    formula: (dose, peso) => (dose * peso) 
+},
+furosemida: {
+    nome: "furosemida",
+    min: 2,
+    max: 4,
+    posologia: "24/24 ",
+    doseMaxima: 3000,
+    frequencia: "1 vezes ao dia",
+    interacoes: [],
+    formula: (dose, peso) => (dose * peso)
+},
+  ceftriaxona: {
+    nome: "Ceftriaxona",
+    min: 50,
+    max: 100,
+    posologia: "1x/dia",
+    doseMaxima: 2400,
+    frequencia: "1",
+    interacoes: ["paracetamol"],
+    formula: (dose, peso) => (dose * peso) 
+}
+};
+  function atualizarSlider() {
+    const medicamento = medicamentoSelect.value;
+    const dados = medicamentos[medicamento];
+
+    slider.min = dados.min;
+    slider.max = dados.max;
+    slider.value = dados.min;
+    doseValor.textContent = slider.value;
+}
+
+  slider.addEventListener("input", () => {
+    doseValor.textContent = slider.value;
+});
+
+  function calcularDose() {
+  const peso = parseFloat(document.getElementById("peso").value);
+  const dosePorKg = parseFloat(slider.value);
+  const medicamento = medicamentoSelect.value;
+  const dados = medicamentos[medicamento];
+
+  if (isNaN(peso) || peso <= 0) {
+    document.getElementById("resultado").innerText = "Insira um peso válido.";
+    return;
+}
+
+  const doseFinal = dados.formula(dosePorKg, peso);
+  const alerta = doseFinal> dados.doseMaxima
+? `<span style="color:red;">⚠️ Excede a dose máxima diária de ${dados.doseMaxima} mg!</span>`
+: `<span style="color:green;">Dentro do limite seguro.</span>`;
+
+  const interacoes = dados.interacoes.length> 0
+? `<br><strong>Interações:</strong> evitar uso concomitante com ${dados.interacoes.join(", ")}.`
+: "";
+
+  document.getElementById("resultado").innerHTML = `
+    <strong>${dados.nome}</strong><br>
+    Dose ajustada: <strong>${doseFinal.toFixed(2)} mg</strong><br>
+    Posologia: <em>${dados.posologia}</em><br>
+    Frequência: <strong>${dados.frequencia}</strong><br>
+    Dose máxima diária: <strong>${dados.doseMaxima} mg</strong><br>
+    ${alerta}
+    ${interacoes}
+  `;
+}
+
+  atualizarSlider();
+</script>
